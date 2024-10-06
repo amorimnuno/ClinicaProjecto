@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Bem-vindo à Clínica</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center mb-4 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">Registo de Paciente</h2>
+                    <p class="card-text">Registe novos pacientes para a sua clínica.</p>
+                    <a href="{{ url_for('cadastro') }}" class="btn btn-primary">Registar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center mb-4 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">Registo de Médico</h2>
+                    <p class="card-text">Adicione médicos à sua equipa.</p>
+                    <a href="{{ url_for('cadastro_medico') }}" class="btn btn-primary">Registar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center mb-4 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">Agendar Consulta</h2>
+                    <p class="card-text">Agende consultas para os pacientes.</p>
+                    <a href="{{ url_for('agendamento') }}" class="btn btn-primary">Agendar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consultas Agendadas -->
+    <div class="row mt-5">
+        <div class="col-md-12 text-center">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title">Consultas Agendadas</h2>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center">ID</th>
+                                <th style="text-align: center">Paciente</th>
+                                <th style="text-align: center">Médico</th>
+                                <th style="text-align: center">Espicialidade</th>
+                                <th style="text-align: center">Data da Consulta</th>
+                                <th style="text-align: center">Hora da Consulta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consulta in consultas %}
+                            <tr>
+                                <td>{{ consulta.id }}</td>
+                                <td>{{ consulta.paciente.nome }}</td>
+                                <td>{{ consulta.medico.nome }}</td>
+                                <td>{{ consulta.medico.especialidade }}</td>
+                                <td>{{ consulta.data_hora.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ consulta.data_hora.strftime('%H:%M') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
