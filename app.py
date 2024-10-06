@@ -11,6 +11,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)  # Initialize SQLAlchemy with the app
 migrate = Migrate(app, db)  # Initialize Flask-Migrate
 
+
 @app.route('/')
 def index():
     consultas = Consulta.query.all()
