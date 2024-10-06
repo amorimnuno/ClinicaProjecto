@@ -21,4 +21,40 @@
     </div>
     <button type="submit" class="btn btn-primary">Registar</button>
 </form>
+
+<h3 class="mt-5">Pacientes Cadastrados</h3>
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Data de Nascimento</th>
+            <th>Telefone</th>
+            <th>Endereço</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if pacientes %}
+            {% for paciente in pacientes %}
+            <tr>
+                <td>{{ paciente.id }}</td>
+                <td>{{ paciente.nome }}</td>
+                <td>{{ paciente.data_nascimento.strftime('%d/%m/%Y') }}</td>
+                <td>{{ paciente.telefone }}</td>
+                <td>{{ paciente.endereco }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('remover_paciente', paciente_id=paciente.id) }}" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Remover</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="6" class="text-center">Nenhum paciente cadastrado.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
 {% endblock %}

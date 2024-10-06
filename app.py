@@ -1,22 +1,25 @@
-from flask import Flask, request, render_template, redirect, url_for
-
+from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_migrate import Migrate
-from models import db, Paciente, Medico, Consulta  # Ensure db is imported
+from models import db, Paciente, Medico, Consulta  # Certifique-se de que db está importado
 from datetime import datetime
+import secrets  # Importa o módulo secrets
 
 app = Flask(__name__)
+
+# Gera uma chave secreta aleatória e define-a no aplicativo Flask
+app.secret_key = secrets.token_hex(16)  # Gera uma chave secreta aleatória
+print(f"Chave secreta gerada: {app.secret_key}")  # Imprime a chave secreta para verificação (opcional)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinica.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)  # Initialize SQLAlchemy with the app
-migrate = Migrate(app, db)  # Initialize Flask-Migrate
-
+db.init_app(app)  # Inicializa SQLAlchemy com o aplicativo
+migrate = Migrate(app, db)  # Inicializa Flask-Migrate
 
 @app.route('/')
 def index():
     consultas = Consulta.query.all()
     return render_template('index.html', consultas=consultas)
-
 
 @app.route('/cadastro_medico', methods=['GET', 'POST'])
 def cadastro_medico():
@@ -29,26 +32,23 @@ def cadastro_medico():
         return redirect(url_for('index'))
     return render_template('cadastro_medico.html')
 
-
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
     if request.method == 'POST':
         nome = request.form['nome']
-
-        # Convert the date string to a date object
-        data_nascimento_str = request.form['data_nascimento']  # Assuming the format is 'YYYY-MM-DD'
-        data_nascimento = datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()  # Convert to date object
-
+        data_nascimento_str = request.form['data_nascimento']  # Supondo que o formato é 'YYYY-MM-DD'
+        data_nascimento = datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()  # Converte para objeto date
         telefone = request.form['telefone']
         endereco = request.form['endereco']
 
-        # Create a new Paciente object with the correct data types
         novo_paciente = Paciente(nome=nome, data_nascimento=data_nascimento, telefone=telefone, endereco=endereco)
         db.session.add(novo_paciente)
         db.session.commit()
-        return redirect(url_for('index'))
-    return render_template('cadastro_paciente.html')
+        return redirect(url_for('cadastro'))
 
+    # Consultar todos os pacientes cadastrados
+    pacientes = Paciente.query.all()
+    return render_template('cadastro_paciente.html', pacientes=pacientes)
 
 @app.route('/agendamento', methods=['GET', 'POST'])
 def agendamento():
@@ -65,9 +65,7 @@ def agendamento():
             db.session.add(nova_consulta)
             db.session.commit()
 
-            # Redireciona para a página de sucesso após o agendamento
             return redirect(url_for('sucesso'))
-
         except Exception as e:
             print(f'Ocorreu um erro: {e}')  # Para depuração
             return "Erro ao agendar a consulta."
@@ -76,14 +74,29 @@ def agendamento():
     medicos = Medico.query.all()
     return render_template('agendamento.html', pacientes=pacientes, medicos=medicos)
 
-
-# Nova rota para a página de sucesso
 @app.route('/sucesso')
 def sucesso():
     return render_template('sucesso.html')
 
 
+@app.route('/remover/<int:paciente_id>', methods=['POST'])
+def remover_paciente(paciente_id):
+    paciente = Paciente.query.get(paciente_id)
+    if paciente:
+        # Remover todas as consultas associadas a este paciente
+        consultas = Consulta.query.filter_by(paciente_id=paciente_id).all()
+        for consulta in consultas:
+            db.session.delete(consulta)  # Remove cada consulta associada
+
+        db.session.delete(paciente)  # Remove o paciente
+        db.session.commit()
+        flash('Paciente removido com sucesso!', 'success')
+    else:
+        flash('Paciente não encontrado.', 'danger')
+    return redirect(url_for('cadastro'))
+
+
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Create all tables if not already created
+        db.create_all()  # Cria todas as tabelas, se ainda não existirem
     app.run(debug=True)
