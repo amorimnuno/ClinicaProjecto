@@ -1,14 +1,14 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_migrate import Migrate
-from models import db, Paciente, Medico, Consulta  # Certifique-se de que db está importado
+from models import db, Paciente, Medico, Consulta
 from datetime import datetime
-import secrets  # Importa o módulo secrets
+import secrets
 
 app = Flask(__name__)
 
 # Gera uma chave secreta aleatória e define-a no aplicativo Flask
 app.secret_key = secrets.token_hex(16)  # Gera uma chave secreta aleatória
-print(f"Chave secreta gerada: {app.secret_key}")  # Imprime a chave secreta para verificação (opcional)
+print(f"Chave secreta gerada: {app.secret_key}")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinica.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -36,7 +36,7 @@ def cadastro_medico():
 def cadastro():
     if request.method == 'POST':
         nome = request.form['nome']
-        data_nascimento_str = request.form['data_nascimento']  # Supondo que o formato é 'YYYY-MM-DD'
+        data_nascimento_str = request.form['data_nascimento']
         data_nascimento = datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()  # Converte para objeto date
         telefone = request.form['telefone']
         endereco = request.form['endereco']
@@ -46,7 +46,7 @@ def cadastro():
         db.session.commit()
         return redirect(url_for('cadastro'))
 
-    # Consultar todos os pacientes cadastrados
+    # Consultar todos os pacientes registados
     pacientes = Paciente.query.all()
     return render_template('cadastro_paciente.html', pacientes=pacientes)
 
@@ -67,7 +67,7 @@ def agendamento():
 
             return redirect(url_for('sucesso'))
         except Exception as e:
-            print(f'Ocorreu um erro: {e}')  # Para depuração
+            print(f'Ocorreu um erro: {e}')
             return "Erro ao agendar a consulta."
 
     pacientes = Paciente.query.all()
