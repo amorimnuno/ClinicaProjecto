@@ -103,7 +103,6 @@ def remover_consulta(consulta_id):
     flash('Consulta removida com sucesso!', 'success')  # Mensagem de confirmação
     return redirect(url_for('index'))  # Redireciona de volta para a página principal
 
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Cria todas as tabelas, se ainda não existirem
