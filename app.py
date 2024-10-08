@@ -16,10 +16,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)  # Inicializa SQLAlchemy com o aplicativo
 migrate = Migrate(app, db)  # Inicializa Flask-Migrate
 
+
 @app.route('/')
 def index():
     consultas = Consulta.query.all()
     return render_template('index.html', consultas=consultas)
+
 
 @app.route('/cadastro_medico', methods=['GET', 'POST'])
 def cadastro_medico():
@@ -31,6 +33,7 @@ def cadastro_medico():
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('cadastro_medico.html')
+
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
@@ -49,6 +52,7 @@ def cadastro():
     # Consultar todos os pacientes registados
     pacientes = Paciente.query.all()
     return render_template('cadastro_paciente.html', pacientes=pacientes)
+
 
 @app.route('/agendamento', methods=['GET', 'POST'])
 def agendamento():
@@ -74,6 +78,7 @@ def agendamento():
     medicos = Medico.query.all()
     return render_template('agendamento.html', pacientes=pacientes, medicos=medicos)
 
+
 @app.route('/sucesso')
 def sucesso():
     return render_template('sucesso.html')
@@ -95,6 +100,7 @@ def remover_paciente(paciente_id):
         flash('Paciente não encontrado.', 'danger')
     return redirect(url_for('cadastro'))
 
+
 @app.route('/remover_consulta/<int:consulta_id>', methods=['POST'])
 def remover_consulta(consulta_id):
     consulta = Consulta.query.get_or_404(consulta_id)  # Obtém a consulta ou retorna 404 se não encontrar
@@ -102,6 +108,7 @@ def remover_consulta(consulta_id):
     db.session.commit()  # Confirma a remoção
     flash('Consulta removida com sucesso!', 'success')  # Mensagem de confirmação
     return redirect(url_for('index'))  # Redireciona de volta para a página principal
+
 
 if __name__ == '__main__':
     with app.app_context():
