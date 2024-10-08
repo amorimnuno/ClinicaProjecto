@@ -95,6 +95,14 @@ def remover_paciente(paciente_id):
         flash('Paciente não encontrado.', 'danger')
     return redirect(url_for('cadastro'))
 
+@app.route('/remover_consulta/<int:consulta_id>', methods=['POST'])
+def remover_consulta(consulta_id):
+    consulta = Consulta.query.get_or_404(consulta_id)  # Obtém a consulta ou retorna 404 se não encontrar
+    db.session.delete(consulta)  # Remove a consulta do banco de dados
+    db.session.commit()  # Confirma a remoção
+    flash('Consulta removida com sucesso!', 'success')  # Mensagem de confirmação
+    return redirect(url_for('index'))  # Redireciona de volta para a página principal
+
 
 if __name__ == '__main__':
     with app.app_context():
